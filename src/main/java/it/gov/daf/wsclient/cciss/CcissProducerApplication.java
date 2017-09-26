@@ -1,4 +1,4 @@
-package it.gov.daf.ccissproducer;
+package it.gov.daf.wsclient.cciss;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

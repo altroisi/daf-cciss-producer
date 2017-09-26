@@ -1,36 +1,51 @@
-package it.gov.daf.ccissproducer;
+package it.gov.daf.wsclient.cciss;
 
+import org.apache.ws.security.WSConstants;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.ws.client.support.interceptor.ClientInterceptor;
+import org.springframework.ws.soap.security.wss4j.Wss4jSecurityInterceptor;
 
 @Configuration
 public class CcissWSConfig {
 
-//	@Value("${client.default-uri}")
-//	private String defaultUri;
-//
-//	@Value("${client.ssl.trust-store}")
-//	private Resource trustStore;
-//
-//	@Value("${client.ssl.trust-store-password}")
-//	private String trustStorePassword;
+	@Value("${client.default-uri:https://ws.cciss.it/wse015/WS_CCISSEXPOService}")
+	private String defaultUri;
+
+	@Value("${client.username}")
+	private String username;
+
+	@Value("${client.password}")
+	private String password;
+	
+	@Bean
+    public Wss4jSecurityInterceptor securityInterceptor(){
+        Wss4jSecurityInterceptor wss4jSecurityInterceptor = new Wss4jSecurityInterceptor();
+        wss4jSecurityInterceptor.setSecurementActions("UsernameToken");
+		wss4jSecurityInterceptor.setSecurementUsername(username);
+		wss4jSecurityInterceptor.setSecurementPassword(password);
+        wss4jSecurityInterceptor.setSecurementPasswordType(WSConstants.PW_TEXT);;
+        wss4jSecurityInterceptor.setSecurementMustUnderstand(false);
+        return wss4jSecurityInterceptor;
+    }
 
 	@Bean
 	public Jaxb2Marshaller marshaller() {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-		// this package must match the package in the <generatePackage>
-		// specified in pom.xml
 		marshaller.setContextPath("it.dtt.e015");
 		return marshaller;
 	}
 
 	@Bean
-	public CcissWSClient quoteClient(Jaxb2Marshaller marshaller) throws Exception {
+	public CcissWSClient ccissClient(Jaxb2Marshaller marshaller) throws Exception {
 		CcissWSClient client = new CcissWSClient();
-		client.setDefaultUri("https://ws.cciss.it/wse015/WS_CCISSEXPOService");
+		client.setDefaultUri(defaultUri);
 		client.setMarshaller(marshaller);
 		client.setUnmarshaller(marshaller);
+		ClientInterceptor[] interceptors = new ClientInterceptor[] {securityInterceptor()};
+		client.setInterceptors(interceptors);
 		// set a httpsUrlConnectionMessageSender to handle the HTTPS session
 //		client.setMessageSender(httpsUrlConnectionMessageSender());
 		return client;
