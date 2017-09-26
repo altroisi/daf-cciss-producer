@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.support.interceptor.ClientInterceptor;
+/*
+ * sembra che le versioni di spring-ws-security successive alla 2.2.4 abbiano un problema con la nuova classe 
+ * (vedi https://jira.spring.io/browse/SWS-970)
+ */
 import org.springframework.ws.soap.security.wss4j.Wss4jSecurityInterceptor;
 
 @Configuration
