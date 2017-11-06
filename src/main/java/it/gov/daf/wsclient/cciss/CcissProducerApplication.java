@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -17,12 +18,15 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.namespace.QName;
 
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 import it.dtt.e015.GeteventiResponse;
 import it.dtt.e015.LocalitaxmlType;
@@ -30,10 +34,16 @@ import it.dtt.e015.NotiziaxmlType;
 import it.gov.daf.iotingestion.event.Event;
 
 @SpringBootApplication
-public class CcissProducerApplication {
+public class CcissProducerApplication implements CommandLineRunner {
 
 	@Value("${client.default-uri:https://ws.cciss.it/wse015/WS_CCISSEXPOService}")
 	private String defaultUri;
+
+	@Value("${mapdb.file}")
+	private String mapdbfile;
+
+	@Autowired
+	private CcissWSClient ccissClient;
 
 	@Autowired
 	private KafkaSender sender;
@@ -42,14 +52,33 @@ public class CcissProducerApplication {
 		SpringApplication.exit(SpringApplication.run(CcissProducerApplication.class, args));
 	}
 	
-	@Bean
-	CommandLineRunner lookup(CcissWSClient quoteClient) {
-		GeteventiResponse response = quoteClient.getEventi(null);
+	@Override
+	public void run(String... args) {
 
-		response.getEVENTI().getNOTIZIA().stream().map(EventBuilder::build)
-				.forEach(e -> sender.send(e.getId().toString(), e));
+		// cache
+		DB db = DBMaker.fileDB(mapdbfile).make();
+		HTreeMap<String, Long> cache = db
+		        .hashMap("idCache", Serializer.STRING, Serializer.LONG)
+		        .expireAfterCreate(60, TimeUnit.MINUTES)
+		        .expireAfterGet(60, TimeUnit.MINUTES)
+		        .createOrOpen();
+		
+		// cciss service invocation
+		GeteventiResponse response = ccissClient.getEventi(null);
 
-		return null;
+		// sending to kafka
+		response.getEVENTI().getNOTIZIA().stream()
+				.map(EventBuilder::build)
+				.filter(e -> !cache.containsKey(e.getId().toString()))
+				.forEach(e -> {
+					cache.put(e.getId().toString(), e.getTs());
+					sender.send(e.getId().toString(), e);
+				});
+
+		// closing cache
+		db.commit();
+		db.close();
+
 	}
 
 	private static class EventBuilder {
