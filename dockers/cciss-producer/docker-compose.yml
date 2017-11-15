@@ -3,7 +3,8 @@ services:
   cciss-producer:
     image: altroisi/cciss-producer
     volumes: 
-      - ./config/:/cciss-producer/config:ro
+      - ./config:/cciss-producer/config:ro
+      - ~/mapdb/cciss-producer:/cciss-producer/mapdb
     environment:
       CONFIG_LOCATION: /cciss-producer/config/application.properties
     extra_hosts:
