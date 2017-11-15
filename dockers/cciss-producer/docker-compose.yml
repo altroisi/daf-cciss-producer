@@ -1,0 +1,13 @@
+version: '2'
+services:
+  cciss-producer:
+    image: altroisi/cciss-producer
+    volumes: 
+      - ./config/:/cciss-producer/config:ro
+    environment:
+      CONFIG_LOCATION: /cciss-producer/config/application.properties
+    extra_hosts:
+      - "edge1.platform.daf.gov.it:192.168.0.20"
+      - "edge2.platform.daf.gov.it:192.168.0.21"
+      - "edge3.platform.daf.gov.it:192.168.0.27"
+      - "ws.cciss.it:195.45.108.80"
