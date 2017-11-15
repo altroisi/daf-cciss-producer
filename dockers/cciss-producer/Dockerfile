@@ -1,12 +1,12 @@
-FROM openjdk:8-jre
-ADD ./target/cciss-producer-0.0.1-SNAPSHOT.jar /usr/local/cciss-producer/
-ADD ./dockers/cciss-producer/wsccissit.crt /usr/local/cciss-producer/wsccissit.crt
+FROM openjdk:8-jre-alpine
 
-RUN keytool -noprompt -storepass changeit -import -alias cciss -keystore $JAVA_HOME/lib/security/cacerts -file /usr/local/cciss-producer/wsccissit.crt
+ARG BUILD_VERSION=0.0.1
 
-ENV KAFKA_TOPIC=
-ENV WS_USER=
-ENV WS_PASS=
+ADD ./target/cciss-producer-${BUILD_VERSION}.jar cciss-producer/
+ADD ./dockers/cciss-producer/wsccissit.crt cciss-producer/wsccissit.crt
 
-RUN cd /usr/local/cciss-producer
-CMD java -jar /usr/local/cciss-producer/cciss-producer-0.0.1-SNAPSHOT.jar --kafka.topic=$KAFKA_TOPIC --client.username=$WS_USER --client.password=$WS_PASS
+RUN keytool -noprompt -storepass changeit -import -alias cciss -keystore $JAVA_HOME/lib/security/cacerts -file cciss-producer/wsccissit.crt
+
+ARG CONFIG_LOCATION
+
+CMD java -jar cciss-producer/cciss-producer-${BUILD_VERSION}.jar --spring.config.location=${CONFIG_LOCATION}
