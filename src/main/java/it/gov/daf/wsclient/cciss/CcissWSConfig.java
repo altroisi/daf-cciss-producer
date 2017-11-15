@@ -15,13 +15,13 @@ import org.springframework.ws.soap.security.wss4j.Wss4jSecurityInterceptor;
 @Configuration
 public class CcissWSConfig {
 
-	@Value("${client.default-uri:https://ws.cciss.it/wse015/WS_CCISSEXPOService}")
+	@Value("${cciss-ws.uri}")
 	private String defaultUri;
 
-	@Value("${client.username}")
+	@Value("${cciss-ws.username}")
 	private String username;
 
-	@Value("${client.password}")
+	@Value("${cciss-ws.password}")
 	private String password;
 	
 	@Bean

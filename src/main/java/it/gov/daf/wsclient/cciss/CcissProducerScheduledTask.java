@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -50,10 +51,10 @@ public class CcissProducerScheduledTask {
 	@Autowired
 	private KafkaSender sender;
 	
-	@Scheduled(fixedRateString = "${scheduler.pullinterval}")
+	@Scheduled(fixedRateString = "${scheduler.pollinginterval}")
 	public void pullEvents() {
 
-		log.info("Start new interation");
+		log.info("Starting new iteration");
 
 		// cache
 		HTreeMap<String, Long> cache = db.hashMap("cciss-events-cache", Serializer.STRING, Serializer.LONG)
@@ -66,14 +67,18 @@ public class CcissProducerScheduledTask {
 		GeteventiResponse response = ccissClient.getEventi(null);
 
 		// sending to kafka
+		AtomicLong count = new AtomicLong();
+
 		response.getEVENTI().getNOTIZIA().parallelStream().map(EventBuilder::build)
-				.filter(e -> !cache.containsKey(e.getId().toString())).forEach(e -> {
+				.filter(e -> !cache.containsKey(e.getId().toString()))
+				.peek(e -> count.incrementAndGet())
+				.forEach(e -> {
 					cache.put(e.getId().toString(), e.getTs());
 					sender.send(e.getId().toString(), e);
 				});
 
 		db.commit();
-		log.info("End of interation");
+		log.info("{} events sent", count.get());
 
 	}
 
