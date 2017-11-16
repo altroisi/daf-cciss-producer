@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.util.StringUtils;
 
 @SpringBootApplication
 @EnableScheduling
@@ -21,6 +22,10 @@ public class CcissProducerApplication {
 
 	@Bean
 	public DB mapDB() {
-		return DBMaker.fileDB(mapdbfile).make();
+		if (StringUtils.isEmpty(mapdbfile)) {
+			return DBMaker.memoryDB().make();
+		} else {
+			return DBMaker.fileDB(mapdbfile).make();
+		}
 	}
 }

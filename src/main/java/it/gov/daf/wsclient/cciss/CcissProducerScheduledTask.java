@@ -54,17 +54,15 @@ public class CcissProducerScheduledTask {
 	@Scheduled(fixedRateString = "${scheduler.pollinginterval}")
 	public void pullEvents() {
 
-		log.info("Starting new iteration");
+		// cciss service invocation
+		log.info("Pulling events...");
+		GeteventiResponse response = ccissClient.getEventi(null);
 
 		// cache
 		HTreeMap<String, Long> cache = db.hashMap("cciss-events-cache", Serializer.STRING, Serializer.LONG)
 				.expireAfterCreate(60, TimeUnit.MINUTES)
 				.expireAfterGet(60, TimeUnit.MINUTES)
 				.createOrOpen();
-
-		// cciss service invocation
-		log.info("Pulling events...");
-		GeteventiResponse response = ccissClient.getEventi(null);
 
 		// sending to kafka
 		AtomicLong count = new AtomicLong();
