@@ -66,13 +66,18 @@ public class CcissProducerScheduledTask {
 
 		// sending to kafka
 		AtomicLong count = new AtomicLong();
-
-		response.getEVENTI().getNOTIZIA().parallelStream().map(EventBuilder::build)
+		response.getEVENTI().getNOTIZIA().parallelStream()
+				.map(n -> EventBuilder.build(n, defaultUri))
 				.filter(e -> !cache.containsKey(e.getId().toString()))
 				.peek(e -> count.incrementAndGet())
 				.forEach(e -> {
-					cache.put(e.getId().toString(), e.getTs());
-					sender.send(e.getId().toString(), e);
+					try {
+						sender.send(e.getId().toString(), e);
+						cache.put(e.getId().toString(), e.getTs());
+					} catch (Exception ex) {
+						log.error("Error while sending event \n {}", new String(e.getBody().array()));
+						ex.printStackTrace();
+					}
 				});
 
 		db.commit();
@@ -82,7 +87,7 @@ public class CcissProducerScheduledTask {
 
 	private static class EventBuilder {
 
-		public static Event build(NotiziaxmlType n) {
+		public static Event build(NotiziaxmlType n, String sourceUri) {
 			
 			Long version = 1L; 
 			String eventId = "cciss." + n.getNumero() + "." + n.getVersione();
@@ -92,7 +97,7 @@ public class CcissProducerScheduledTask {
 			Integer eventTypeId = 2; 
 			CharSequence eventSubtypeId = "CCISS_" + n.getEvento();
 			CharSequence eventAnnotation = n.getTesto();
-			CharSequence source = "defaultUri";
+			CharSequence source = sourceUri;
 			CharSequence location = n.getLocalita().stream().filter(l -> l.getTipo().equals("START")).findFirst()
 					.map(l2 -> l2.getLat() + "," + l2.getLng())
 					.orElse(n.getLocalita().stream().filter(l -> l.getTipo().equals("AFFECTED")).findFirst()
