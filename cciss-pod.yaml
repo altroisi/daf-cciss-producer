@@ -1,0 +1,60 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: cciss-event-producer-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cciss-event-producer
+    spec:
+      restartPolicy: Always
+      hostNetwork: false
+      containers:
+      - name: cciss-event-producer
+        image: 10.98.74.120:5000/cciss-producer:0.0.1
+        imagePullPolicy: Always
+        lifecycle:
+          postStart:
+            exec:
+             command: ["/bin/sh", "-c", "cat /etc/extra_hosts >> /etc/hosts"]
+        env:
+        - name: CONFIG_LOCATION
+          value: "/opt/docker/conf/application.properties"
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - name: glusterfsvol
+          mountPath: /opt/docker/conf/application.properties
+          subPath: cciss-event-producer/conf/application.properties
+          readOnly: true
+        - name: glusterfsvol
+          mountPath: /opt/docker/conf/logback.xml
+          subPath: cciss-event-producer/conf/logback.xml
+          readOnly: true
+        - name: glusterfsvol
+          mountPath: /opt/docker/mapdb
+          subPath: cciss-event-producer/mapdb
+          readOnly: false
+        - name: glusterfsvol
+          mountPath: /opt/docker/logs
+          subPath: cciss-event-producer/logs
+          readOnly: false
+        - name: hosts
+          mountPath: /etc/extra_hosts
+        - name: krb5conf
+          mountPath: /etc/krb5.conf
+      imagePullSecrets:
+        - name: regsecret
+      volumes:
+      - name: glusterfsvol
+        persistentVolumeClaim:
+          claimName: gluster-claim
+      - name: hosts
+        hostPath:
+          path: /etc/hosts
+      - name: krb5conf
+        hostPath:
+          path: /etc/krb5.conf
