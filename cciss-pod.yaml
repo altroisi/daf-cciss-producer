@@ -13,7 +13,7 @@ spec:
       hostNetwork: false
       containers:
       - name: cciss-event-producer
-        image: 10.98.74.120:5000/cciss-producer:0.0.1
+        image: nexus.daf.teamdigitale.it/cciss-producer:0.0.1
         imagePullPolicy: Always
         lifecycle:
           postStart:
