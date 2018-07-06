@@ -29,9 +29,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import it.dtt.e015.GeteventiResponse;
-import it.dtt.e015.LocalitaxmlType;
-import it.dtt.e015.NotiziaxmlType;
+import it.dtt.ws.ccissexpo.GeteventiResponseType;
+import it.dtt.ws.ccissexpo.LocalitaxmlType;
+import it.dtt.ws.ccissexpo.NotiziaxmlType;
 import it.gov.daf.iotingestion.event.Event;
 
 @Component
@@ -56,7 +56,7 @@ public class CcissProducerScheduledTask {
 
 		// cciss service invocation
 		log.info("Pulling events...");
-		GeteventiResponse response = ccissClient.getEventi(null);
+		GeteventiResponseType response = ccissClient.getEventi(null);
 
 		// cache
 		HTreeMap<String, Long> cache = db.hashMap("cciss-events-cache", Serializer.STRING, Serializer.LONG)
@@ -66,18 +66,21 @@ public class CcissProducerScheduledTask {
 
 		// sending to kafka
 		AtomicLong count = new AtomicLong();
-		response.getEVENTI().getNOTIZIA().parallelStream()
-				.map(n -> EventBuilder.build(n, defaultUri))
-				.filter(e -> !cache.containsKey(e.getId().toString()))
-				.peek(e -> count.incrementAndGet())
-				.forEach(e -> {
-					try {
-						sender.send(e.getId().toString(), e);
-						cache.put(e.getId().toString(), e.getTs());
-					} catch (Exception ex) {
-						log.error("Error while sending event \n {}", new String(e.getBody().array()));
-						ex.printStackTrace();
-					}
+		response.getEVENTI().parallelStream()
+				.forEach(ev -> {
+					ev.getNOTIZIA().parallelStream()
+							.map(n -> EventBuilder.build(n, defaultUri))
+							.filter(e -> !cache.containsKey(e.getId().toString()))
+							.peek(e -> count.incrementAndGet())
+							.forEach(e -> {
+								try {
+									sender.send(e.getId().toString(), e);
+									cache.put(e.getId().toString(), e.getTs());
+								} catch (Exception ex) {
+									log.error("Error while sending event \n {}", new String(e.getBody().array()));
+									ex.printStackTrace();
+								}
+							});
 				});
 
 		db.commit();

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:sch="http://ccissexpo.ws.dtt.it" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://ccissexpo.ws.dtt.it" targetNamespace="http://ccissexpo.ws.dtt.it">
+	<wsdl:types xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:cciss="http://ccissexpo.ws.dtt.it"
+			attributeFormDefault="qualified" elementFormDefault="qualified"
+			targetNamespace="http://ccissexpo.ws.dtt.it">
+			<element name="richiestaCcissExpo" type="cciss:GeteventiType"
+				xmlns="http://www.w3.org/2001/XMLSchema">
+				<annotation xmlns="http://www.w3.org/2001/XMLSchema">
+					<documentation xmlns="http://www.w3.org/2001/XMLSchema">
+						E' l'elemento radice del file XML; contiene tutti i dati relativi
+						alla richiesta.
+					</documentation>
+				</annotation>
+			</element>
+			<complexType name="GeteventiType" xmlns="http://www.w3.org/2001/XMLSchema">
+				<sequence xmlns="http://www.w3.org/2001/XMLSchema">
+					<element minOccurs="0" name="FiltroProv" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+				</sequence>
+			</complexType>
+			<complexType name="MessaggiType" xmlns="http://www.w3.org/2001/XMLSchema">
+				<sequence xmlns="http://www.w3.org/2001/XMLSchema">
+					<element maxOccurs="unbounded" minOccurs="0" name="messaggio"
+						type="cciss:MessaggioType" xmlns="http://www.w3.org/2001/XMLSchema" />
+				</sequence>
+			</complexType>
+			<complexType name="MessaggioType" xmlns="http://www.w3.org/2001/XMLSchema">
+				<sequence xmlns="http://www.w3.org/2001/XMLSchema">
+					<element name="codiceMessaggio" type="cciss:StringDue"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element name="descrizioneMessaggio" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+				</sequence>
+			</complexType>
+			<complexType name="ErroriType" xmlns="http://www.w3.org/2001/XMLSchema">
+				<sequence xmlns="http://www.w3.org/2001/XMLSchema">
+					<element maxOccurs="unbounded" minOccurs="0" name="errore"
+						type="cciss:ErroreType" xmlns="http://www.w3.org/2001/XMLSchema" />
+				</sequence>
+			</complexType>
+			<complexType name="ErroreType" xmlns="http://www.w3.org/2001/XMLSchema">
+				<sequence xmlns="http://www.w3.org/2001/XMLSchema">
+					<element name="codiceErrore" type="cciss:StringDue"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element name="descrizioneErrore" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+				</sequence>
+			</complexType>
+			<complexType name="eventixmlType" xmlns="http://www.w3.org/2001/XMLSchema">
+				<sequence xmlns="http://www.w3.org/2001/XMLSchema">
+					<element maxOccurs="unbounded" minOccurs="0" name="NOTIZIA"
+						type="cciss:notiziaxmlType" xmlns="http://www.w3.org/2001/XMLSchema" />
+				</sequence>
+			</complexType>
+			<complexType name="notiziaxmlType" xmlns="http://www.w3.org/2001/XMLSchema">
+				<sequence xmlns="http://www.w3.org/2001/XMLSchema">
+					<element minOccurs="0" name="locationDBVersion" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element minOccurs="0" name="luogo_punto" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element minOccurs="0" name="evento" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element minOccurs="0" name="testo" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element maxOccurs="unbounded" minOccurs="0" name="localita"
+						type="cciss:localitaxmlType" xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element minOccurs="0" name="direzione" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element minOccurs="0" name="nomedirezione" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element minOccurs="0" name="tipo" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element minOccurs="0" name="iconName" type="string"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+				</sequence>
+				<attribute name="priorita" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+				<attribute name="ora" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+				<attribute name="data" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+				<attribute name="versione" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+				<attribute name="numero" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+			</complexType>
+			<complexType name="localitaxmlType" xmlns="http://www.w3.org/2001/XMLSchema">
+				<attribute name="tipo" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+				<attribute name="locid" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+				<attribute name="prov" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+				<attribute name="reg" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+				<attribute name="lng" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+				<attribute name="lat" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+				<attribute name="code" type="string"
+					xmlns="http://www.w3.org/2001/XMLSchema" />
+			</complexType>
+			<simpleType name="StringDue" xmlns="http://www.w3.org/2001/XMLSchema">
+				<restriction base="string" xmlns="http://www.w3.org/2001/XMLSchema">
+					<pattern value="[a-zA-Z0-9][a-zA-Z0-9]" xmlns="http://www.w3.org/2001/XMLSchema" />
+				</restriction>
+			</simpleType>
+			<simpleType name="VarCharOtto" xmlns="http://www.w3.org/2001/XMLSchema">
+				<restriction base="string" xmlns="http://www.w3.org/2001/XMLSchema">
+					<maxLength value="8" xmlns="http://www.w3.org/2001/XMLSchema" />
+				</restriction>
+			</simpleType>
+			<element name="rispostaCcissExpo" type="cciss:GeteventiResponseType"
+				xmlns="http://www.w3.org/2001/XMLSchema">
+				<annotation xmlns="http://www.w3.org/2001/XMLSchema">
+					<documentation xmlns="http://www.w3.org/2001/XMLSchema">
+						E' l'elemento radice del file XML; contiene tutti i dati relativi
+						alla risposta.
+					</documentation>
+				</annotation>
+			</element>
+			<complexType name="GeteventiResponseType" xmlns="http://www.w3.org/2001/XMLSchema">
+				<choice xmlns="http://www.w3.org/2001/XMLSchema">
+					<sequence xmlns="http://www.w3.org/2001/XMLSchema">
+						<element maxOccurs="unbounded" minOccurs="0" name="EVENTI"
+							type="cciss:eventixmlType" xmlns="http://www.w3.org/2001/XMLSchema" />
+					</sequence>
+					<element minOccurs="0" name="ERRORI" type="cciss:ErroriType"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+					<element minOccurs="0" name="MESSAGGI" type="cciss:MessaggiType"
+						xmlns="http://www.w3.org/2001/XMLSchema" />
+				</choice>
+			</complexType>
+		</schema>
+	</wsdl:types>
+	<wsdl:message name="richiestaCcissExpo" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+		<wsdl:part element="tns:richiestaCcissExpo" name="richiestaCcissExpo"
+			xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" />
+	</wsdl:message>
+	<wsdl:message name="rispostaCcissExpo" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+		<wsdl:part element="tns:rispostaCcissExpo" name="rispostaCcissExpo"
+			xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" />
+	</wsdl:message>
+	<wsdl:portType name="ccissExpo" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+		<wsdl:operation name="CcissExpo" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+			<wsdl:input message="tns:richiestaCcissExpo" name="richiestaCcissExpo"
+				xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" />
+			<wsdl:output message="tns:rispostaCcissExpo" name="rispostaCcissExpo"
+				xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="ccissExpoSoap11" type="tns:ccissExpo"
+		xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+		<wsdl:operation name="CcissExpo" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+			<soap:operation soapAction=""
+				xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+			<wsdl:input name="richiestaCcissExpo" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+				<soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+			</wsdl:input>
+			<wsdl:output name="rispostaCcissExpo" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+				<soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="ccissExpoService" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+		<wsdl:port binding="tns:ccissExpoSoap11" name="ccissExpoSoap11"
+			xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+			<soap:address
+				location="https://www.cciss.it/wse015/services/WS_CCISSEXPOService"
+				xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -20,7 +20,7 @@ public class KafkaSender {
 
 	public void send(String id, Event payload) {
 		log.debug("sending payload='{}' with id='{}' to topic='{}'", payload, id, topic);
-		kafkaTemplate.send(topic, id, payload);
+		// kafkaTemplate.send(topic, id, payload);
 	}
 
 }

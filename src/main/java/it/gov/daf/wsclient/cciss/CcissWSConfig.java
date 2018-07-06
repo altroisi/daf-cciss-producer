@@ -38,7 +38,7 @@ public class CcissWSConfig {
 	@Bean
 	public Jaxb2Marshaller marshaller() {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-		marshaller.setContextPath("it.dtt.e015");
+		marshaller.setContextPath("it.dtt.ws.ccissexpo");
 		return marshaller;
 	}
 
@@ -54,43 +54,5 @@ public class CcissWSConfig {
 //		client.setMessageSender(httpsUrlConnectionMessageSender());
 		return client;
 	}
-
-	/*@Bean
-	public HttpsUrlConnectionMessageSender httpsUrlConnectionMessageSender() throws Exception {
-		HttpsUrlConnectionMessageSender httpsUrlConnectionMessageSender = new HttpsUrlConnectionMessageSender();
-		httpsUrlConnectionMessageSender.setTrustManagers(trustManagersFactoryBean().getObject());
-		// allows the client to skip host name verification as otherwise
-		// following error is thrown:
-		// java.security.cert.CertificateException: No name matching localhost
-		// found
-		httpsUrlConnectionMessageSender.setHostnameVerifier(new HostnameVerifier() {
-			@Override
-			public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
-				if ("localhost".equals(hostname)) {
-					return true;
-				}
-				return false;
-			}
-		});
-
-		return httpsUrlConnectionMessageSender;
-	}
-
-	@Bean
-	public KeyStoreFactoryBean trustStore() {
-		KeyStoreFactoryBean keyStoreFactoryBean = new KeyStoreFactoryBean();
-		keyStoreFactoryBean.setLocation(trustStore);
-		keyStoreFactoryBean.setPassword(trustStorePassword);
-
-		return keyStoreFactoryBean;
-	}
-
-	@Bean
-	public TrustManagersFactoryBean trustManagersFactoryBean() {
-		TrustManagersFactoryBean trustManagersFactoryBean = new TrustManagersFactoryBean();
-		trustManagersFactoryBean.setKeyStore(trustStore().getObject());
-
-		return trustManagersFactoryBean;
-	}*/
 
 }
